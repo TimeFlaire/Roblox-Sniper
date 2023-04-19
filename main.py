@@ -50,7 +50,7 @@ class Sniper:
         self.last_time = 0
         self.errors = 0
         self.clear = "cls" if os.name == 'nt' else "clear"
-        self.version = "0.16.1a"
+        self.version = "0.16.1"
         self.task = None
         self.scraped_ids = []
         self.latest_free_item = {}
