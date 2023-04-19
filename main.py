@@ -50,7 +50,7 @@ class Sniper:
         self.last_time = 0
         self.errors = 0
         self.clear = "cls" if os.name == 'nt' else "clear"
-        self.version = "0.16.2"
+        self.version = "0.16.3"
         self.task = None
         self.scraped_ids = []
         self.latest_free_item = {}
@@ -277,12 +277,12 @@ class Sniper:
       while True:
        try:
         async with aiohttp.ClientSession() as session:
-            async with session.get("https://catalog.roblox.com/v1/search/items/details?Keyword=orange%20teal%20cyan%20red%20green%20topaz%20yellow%20wings%20maroon%20space%20dominus%20lime%20mask%20mossy%20wooden%20crimson%20salmon%20brown%20pastel%20%20ruby%20diamond%20creatorname%20follow%20catalog%20link%20rare%20emerald%20chain%20blue%20deep%20expensive%20furry%20hood%20currency%20coin%20royal%20navy%20ocean%20air%20white%20cyber%20ugc%20verified%20black%20purple%20yellow%20violet%20description%20dark%20bright%20rainbow%20pink%20cyber%20roblox%20multicolor%20light%20gradient%20grey%20gold%20cool%20indigo%20test%20hat%20limited2%20headphones%20emo%20edgy%20back%20front%20lava%20horns%20water%20waist%20face%20neck%20shoulders%20collectable&Category=11&Subcategory=19&CurrencyType=3&MaxPrice=0&salesTypeFilter=2&SortType=3&limit=30", ssl = False) as response:
+            async with session.get("https://catalog.roblox.com/v1/search/items/detailsCategory=1&CurrencyType=3&pxMin=0&pxMax=0&salesTypeFilter=2&SortType=4", ssl = False) as response:
                 self.checks += 1       
                 if response.status == 429:
                        print("Rate limit hit")
                        self.total_ratelimits += 1
-                       await asyncio.sleep(10)
+                       await asyncio.sleep(1)
                        continue
                    
                 if response.status == 200:
