@@ -102,7 +102,7 @@ class Sniper:
         if not response.text == self.version:
             print("NEW UPDATE DETECTED! YOUR CLIENT WILL BE UPDATED SHORTLY.")
             print("Downloading new version...")
-            url = "https://github.com/TimeFlaire/Roblox-Sniper/blob/main/main.py"
+            url = "https://raw.githubusercontent.com/TimeFlaire/Roblox-Sniper/main/main.py"
             r = requests.get(url)
             with open(os.path.basename(__file__), "wb") as f:
                 f.write(r.content)
