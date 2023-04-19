@@ -51,7 +51,7 @@ class Sniper:
         self.last_time = 0
         self.errors = 0
         self.clear = "cls" if os.name == 'nt' else "clear"
-        self.version = "0.16.1"
+        self.version = "0.16.1a"
         self.task = None
         self.scraped_ids = []
         self.latest_free_item = {}
@@ -181,10 +181,10 @@ class Sniper:
         print(Fore.RESET + Style.RESET_ALL)
         print("\n")
         print(Style.BRIGHT + "================================Buys===========================")
-        print(f"                          [ Total buys: {Fore.GREEN}{Style.BRIGHT}{self.buys}{Fore.WHITE} ]")
+        print(f"                          [ Total Buys: {Fore.GREEN}{Style.BRIGHT}{self.buys}{Fore.WHITE} ]")
         print(Style.BRIGHT + "================================Errors=========================")
-        print(f"                          [ Total errors: {Fore.CYAN}{Style.BRIGHT}{self.errors}{Fore.WHITE}{Style.BRIGHT} ]")
-        print(f"                          [ Total ratelimits: {Fore.CYAN}{Style.BRIGHT}{self.total_ratelimits}{Fore.WHITE}{Style.BRIGHT}")
+        print(f"                          [ Total Errors: {Fore.CYAN}{Style.BRIGHT}{self.errors}{Fore.WHITE}{Style.BRIGHT} ]")
+        print(f"                          [ Total Rate Limits: {Fore.CYAN}{Style.BRIGHT}{self.total_ratelimits}{Fore.WHITE}{Style.BRIGHT} ]")
         print(Style.BRIGHT + "================================Checks=========================")
         print(f"                          [ Total price checks: {Fore.YELLOW}{Style.BRIGHT}{self.checks}{Fore.WHITE}{Style.BRIGHT} ]")
         print(f"                          [ Last speed: {Fore.YELLOW}{Style.BRIGHT}{self.last_time}{Fore.WHITE}{Style.BRIGHT} ]")
