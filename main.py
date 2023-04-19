@@ -55,39 +55,10 @@ class Sniper:
         self.scraped_ids = []
         self.latest_free_item = {}
         self._setup_accounts()
-        
-        # / couldn't fix errors aka aiohttp does not support proxies
-        # self.proxylist = open("proxylist.txt").read().splitlines()
-        # self.workingProxies = []
-        # asyncio.run(self.start_proxy())
-        # print(self.workingProxies)
         self.check_version()
         
-        # asyncio.run(self.start())
         asyncio.run(self.start())
         
-    # / couldn't fix errors aka aiohttp does not support proxies
-    #async def check(self, proxy):
-    #  async with aiohttp.ClientSession() as session:
-    #      async with session.get('http://httpbin.org/ip', proxy=f'http://{proxy}', timeout=aiohttp.ClientTimeout(total=2), ssl = False) as resp:
-    #          if resp.status == 200:
-    #            self.workingProxies.append(proxy)
-    #            return
-            
-    #def get_working_proxy(self):
-    #  if len(self.workingProxies) != 0:
-    #     proxy = random.choice(self.workingProxies)
-    #     return f"http://{proxy}"
-    #  else:
-    #    return None
-
-    #async def start_proxy(self):
-    #  self.status = "Proxy checker"
-    #  self._print_stats
-    #  coroutines = []
-    #  for proxy in self.proxylist:
-    #      coroutines.append(self.check(proxy))
-    #  await asyncio.gather(*coroutines)
     
 
 
