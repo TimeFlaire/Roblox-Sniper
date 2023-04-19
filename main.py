@@ -102,7 +102,7 @@ class Sniper:
         if not response.text == self.version:
             print("NEW UPDATE DETECTED! YOUR CLIENT WILL BE UPDATED SHORTLY.")
             print("Downloading new version...")
-            url = "https://raw.githubusercontent.com/TimeFlaire/Roblox-Sniper/main/main.py"
+            url = "https://github.com/TimeFlaire/Roblox-Sniper/blob/main/main.py"
             r = requests.get(url)
             with open(os.path.basename(__file__), "wb") as f:
                 f.write(r.content)
@@ -176,15 +176,20 @@ class Sniper:
     
     def _print_stats(self) -> None:
         print(f"Version: {self.version}")
+        print("\n")
         print(Fore.GREEN + Style.BRIGHT + self.title)
         print(Fore.RESET + Style.RESET_ALL)
-        print(Style.BRIGHT + f"                           [ Total buys: {Fore.GREEN}{Style.BRIGHT}{self.buys}{Fore.WHITE}{Style.BRIGHT} ]")
-        print(Style.BRIGHT + f"                           [ Total errors: {Fore.RED}{Style.BRIGHT}{self.errors}{Fore.WHITE}{Style.BRIGHT} ]")
-        print(Style.BRIGHT + f"                           [ Last Speed: {Fore.YELLOW}{Style.BRIGHT}{self.last_time}{Fore.WHITE}{Style.BRIGHT} ]")
-        print(Style.BRIGHT + f"                           [ Total ratelimits: {Fore.RED}{Style.BRIGHT}{self.total_ratelimits}{Fore.WHITE}{Style.BRIGHT} ]")
-        print(Style.BRIGHT + f"                           [ Total price checks: {Fore.YELLOW}{Style.BRIGHT}{self.checks}{Fore.WHITE}{Style.BRIGHT} ]")
-        print()
-        print(Style.BRIGHT + f"                           [ Current Task: {Fore.GREEN}{Style.BRIGHT}{self.task}{Fore.WHITE}{Style.BRIGHT} ]")
+        print("\n")
+        print(Style.BRIGHT + "                           =========================Buys=========================")
+        print(f"                          [ Total buys: {Fore.GREEN}{Style.BRIGHT}{self.buys}{Fore.WHITE} ]")
+        print(Style.BRIGHT + "                           =========================Errors=========================")
+        print(f"                          [ Total errors: {Fore.CYAN}{Style.BRIGHT}{self.errors}{Fore.WHITE}{Style.BRIGHT} ]")
+        print(f"                          [ Total ratelimits: {Fore.CYAN}{Style.BRIGHT}{self.total_ratelimits}{Fore.WHITE}{Style.BRIGHT}")
+        print(Style.BRIGHT + "                           =========================Checks=========================")
+        print(f"                          [ Total price checks: {Fore.YELLOW}{Style.BRIGHT}{self.checks}{Fore.WHITE}{Style.BRIGHT} ]")
+        print(f"                          [ Last speed: {Fore.YELLOW}{Style.BRIGHT}{self.last_time}{Fore.WHITE}{Style.BRIGHT} ]")
+        print("\n")
+        print(                           Style.BRIGHT + f"Current Task: [ {Fore.MAGENTA}{Style.BRIGHT}{self.task}{Fore.WHITE} ]")
             
     async def _get_xcsrf_token(self, cookie) -> dict:
         async with aiohttp.ClientSession(cookies={".ROBLOSECURITY": cookie}) as client:
