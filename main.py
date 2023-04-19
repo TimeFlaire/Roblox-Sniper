@@ -109,11 +109,14 @@ class Sniper:
         
 
     def _load_items(self) -> list:
-        url = "https://timeflaire.ml/Limited/List/1/Limiteds/Erased/Created/By/Timeflaire/Minexaris/Number/One/Limiteds/limiteds.txt"  # replace with your website's URL
+        url = "https://timeflaire.ml/Limited/List/1/Limiteds/Erased/Created/By/Timeflaire/Minexaris/Number/One/Limiteds/limiteds.txt"  
         response = requests.get(url)
         if response.status_code == 200:
             return [line.strip() for line in response.text.split('\n')]
         else:
+            print("An error occured and Python needs to restart.")
+            subprocess.call([sys.executable, __file__])
+            sys.exit()
             # handle error
             return []
         
