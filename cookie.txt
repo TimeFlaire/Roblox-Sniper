@@ -1,3 +1,0 @@
-Cookie 1
-Cookie 2
-Erase any unnecessary lines. If your cookie ends with ";", remove it

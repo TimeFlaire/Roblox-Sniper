@@ -1,0 +1,35 @@
+{
+    "webhook": {
+        "enabled": true,
+        "url": ""
+    },
+    "items": [
+        {
+            "id": "13063319555",
+            "start": null,
+            "end": null,
+            "max_price": null,
+            "max_buys": null,
+            "importance": 1
+        }
+    ],
+    "accounts": [
+        {
+            "cookie": ""
+        }
+    ],
+    "proxy": {
+        "enabled": true,
+        "timeout_ms": 1000,
+        "proxy_list": "proxies.txt"
+    },
+    "theme": {
+        "name": "main_theme",
+        "wait_time": 1
+    },
+    "discord": {
+        "enabled": true,
+        "prefix": "$",
+        "token": ""
+    }
+}
