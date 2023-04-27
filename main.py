@@ -1,7 +1,3 @@
-# made by xolo#4942
-# version 10.0.2
-
-
 try:
   import datetime
   import os
