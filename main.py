@@ -2,7 +2,6 @@ try:
   import datetime
   import os
   import sys
-  import sys
   import subprocess
   import uuid
   import asyncio
@@ -19,7 +18,8 @@ except ModuleNotFoundError:
     print("Modules not installed properly installing now")
     os.system("pip install requests")
     os.system("pip install colorama")
-    os.system("pip install httpx")
+    os.system("pip install colorama")
+    os.system("pip install aiohttp")
     os.system("pip install rapidjson")
     os.system("pip install discord")
     
@@ -32,8 +32,11 @@ class Sniper:
             self.refill_interval = refill_interval
             self.last_refill_time = asyncio.get_event_loop().time()
 
-        async def take(self, tokens: int):
+        async def take(self, tokens: int, proxy=False):
             while True:
+                if proxy:
+                    return True
+                
                 elapsed = asyncio.get_event_loop().time() - self.last_refill_time
                 if elapsed > self.refill_interval:
                    self.tokens = self.max_tokens
@@ -98,7 +101,7 @@ class Sniper:
         self.last_time = 0
         self.errors = 0
         self.clear = "cls" if os.name == 'nt' else "clear"
-        self.version = "0.15.13"
+        self.version = "0.15.12"
         self.task = None
         self.timeout = self.config['proxy']['timeout_ms'] / 1000 if self.config['proxy']["enabled"] else None
         self.latest_free_item = {}
@@ -108,7 +111,9 @@ class Sniper:
         self.tasks = {}
         self.themeWaitTime = float(self.config.get('theme')['wait_time'])
         self.proxies = []
+        self.proxy_auth = None
         if self.config['proxy']['enabled']:
+            self.proxy_auth = aiohttp.BasicAuth(self.config['proxy']['authentication']['username'], self.config['proxy']['authentication']['password']) if self.config['proxy']['authentication']['enabled'] else None
             with open(self.config['proxy']['proxy_list']) as f:
                 lines = [line.strip() for line in f if line.rstrip()]
             response = asyncio.run(self.check_all_proxies(lines))
@@ -123,7 +128,7 @@ class Sniper:
     async def check_proxy(self, proxy):
         try:
           async with aiohttp.ClientSession() as session:
-            response = await session.get('https://google.com/', timeout=self.timeout, proxy=f"http://{proxy}")
+            response = await session.get('https://google.com/', timeout=self.timeout, proxy=f"http://{proxy}", proxy_auth = self.proxy_auth)
             if response.status_code == 200:
                 return proxy
         except:
@@ -188,40 +193,40 @@ class Sniper:
             return await ctx.reply("Id successfully removed")
             
         @bot.command(name="add_id")
-        async def add_id(ctx, arg=None):
-            if arg is None:
+        async def add_id(ctx, id=None, start=None, end=None, max_price=None, max_buys=None, importance = None):
+            if id is None:
                return await ctx.reply("You need to enter an ID to add")
 
-            if not arg.isdigit():
-                        return await ctx.reply(f"Invalid item id given ID: {arg}")
+            if not id.isdigit():
+                        return await ctx.reply(f"Invalid item id given ID: {id}")
                         
-            if arg in self.tasks:
+            if id in self.tasks:
                return await ctx.reply("ID is currently running")
             
             self.config['items'].append({
-                "id": arg,
-                "start": None,
-                "end": None,
-                "max_price": None,
-                "max_buys": None,
-                "importance": 1
+                "id": id,
+                "start": None if start is None else start,
+                "end": None if end is None else end,
+                "max_price": None if max_price is None else int(max_price),
+                "max_buys": None if max_buys is None else int(max_buys),
+                "importance": 1 if importance is None or not int(importance) > 0 else int(importance)
             })
             with open('config.json', 'w') as f:
                  json.dump(self.config, f, indent=4)
-            self.items[arg] = {}
-            self.items[arg]['current_buys'] = 0
+            self.items[id] = {}
+            self.items[id]['current_buys'] = 0
             for item in self.config["items"]:
-                if int(item['id']) == int(arg):
+                if int(item['id']) == int(id):
                     item = item
                     break
-            self.items[arg]['max_buys'] = float('inf') if item['max_buys'] is None else int(item['max_buys'])
-            self.items[arg]['max_price'] = float('inf') if item['max_price'] is None else int(item['max_price'])
+            self.items[id]['max_buys'] = float('inf') if item['max_buys'] is None else int(item['max_buys'])
+            self.items[id]['max_price'] = float('inf') if item['max_price'] is None else int(item['max_price'])
             self.waitTime = 1 * len(self.items) if len(self.items) > 0 else 1
             async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=None)) as session:
                 
                 await ctx.reply("ID successfully added")
-                self.tasks[arg] = asyncio.create_task(self.search(session=session, id=arg, bypass=True))
-                await asyncio.gather(self.tasks[arg])
+                self.tasks[id] = asyncio.create_task(self.search(session=session, id=id))
+                await asyncio.gather(self.tasks[id])
 
             
             
@@ -250,7 +255,7 @@ class Sniper:
             sys.exit()
         else:
             print("Your version is up to date.")
-            
+
     class DotDict(dict):
         def __getattr__(self, attr):
             return self[attr]
@@ -372,7 +377,7 @@ class Sniper:
          total_errors = 0
          async with aiohttp.ClientSession() as client:   
             while True:
-                if not int(self.items[raw_id]['max_buys']) > int(self.items[raw_id]['total_buys']):
+                if not float(self.items[raw_id]['max_buys']) > float(self.items[raw_id]['current_buys']):
                     self.waitTime((len(self.items) - 1))
                     del self.items[id]
                     for item in self.config['items']:
@@ -445,9 +450,8 @@ class Sniper:
      async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=None)) as session:
       while True:
         try:
-
+            await self.ratelimit.take(1, proxy = True if len(self.proxies) > 0 else False)
             async with session.get("https://catalog.roblox.com/v2/search/items/details?Keyword=orange%20teal%20cyan%20red%20green%20topaz%20yellow%20wings%20maroon%20space%20dominus%20lime%20mask%20mossy%20wooden%20crimson%20salmon%20brown%20pastel%20%20ruby%20diamond%20creatorname%20follow%20catalog%20link%20rare%20emerald%20chain%20blue%20deep%20expensive%20furry%20hood%20currency%20coin%20royal%20navy%20ocean%20air%20white%20cyber%20ugc%20verified%20black%20purple%20yellow%20violet%20description%20dark%20bright%20rainbow%20pink%20cyber%20roblox%20multicolor%20light%20gradient%20grey%20gold%20cool%20indigo%20test%20hat%20limited2%20headphones%20emo%20edgy%20back%20front%20lava%20horns%20water%20waist%20face%20neck%20shoulders%20collectable&Category=11&Subcategory=19&CurrencyType=3&MaxPrice=0&salesTypeFilter=2&SortType=3&limit=120", ssl = False) as response:
-                  await self.ratelimit.take(1)
                   response.raise_for_status()
                    
                   items = (json.loads(await response.text())['data'])
@@ -463,7 +467,7 @@ class Sniper:
                         
                           if self.latest_free_item.get("collectibleItemId") is None:
                               continue
-                          await self.ratelimit.take(1)
+                          await self.ratelimit.take(1, proxy = True if len(self.proxies) > 0 else False)
                           productid_response = await session.post("https://apis.roblox.com/marketplace-items/v1/items/details",
                                      json={"itemIds": [self.latest_free_item["collectibleItemId"]]},
                                      headers={"x-csrf-token": self.accounts[str(random.randint(1, len(self.accounts)))]["xcsrf_token"], 'Accept': "application/json"},
@@ -491,15 +495,12 @@ class Sniper:
             self.checks += 1
             await asyncio.sleep(5)
             
-    async def search(self, session, id, bypass=False) -> None:
-      if not bypass:
-        for item in self.config["items"]:
+    async def search(self, session, id, ) -> None:
+      for item in self.config["items"]:
           itemo = item
           if item["id"] == id:
               start_date  = item['start']
               end_date = item['end']
-      else:
-          date = None
       while True:
         try:
                     if self.config['proxy']['enabled'] and len(self.proxies) > 0:
@@ -531,12 +532,12 @@ class Sniper:
                 
                     if not id.isdigit():
                         raise Exception(f"Invalid item id given ID: {id}")
-                    await self.ratelimit.take(1)
+                    await self.ratelimit.take(1, proxy = True if len(self.proxies) > 0 else False)
                     currentAccount = self.accounts[str(random.randint(1, len(self.accounts)))]
                     async with session.post("https://catalog.roblox.com/v1/catalog/items/details",
                                            json={"items": [{"itemType": "Asset", "id": id}]},
                                            headers={"x-csrf-token": currentAccount['xcsrf_token'], 'Accept': "application/json"},
-                                           cookies={".ROBLOSECURITY": currentAccount["cookie"]}, ssl=False, proxy=proxy, timeout=self.timeout) as response:
+                                           cookies={".ROBLOSECURITY": currentAccount["cookie"]}, ssl=False, proxy=proxy, timeout=self.timeout, proxy_auth = self.proxy_auth) as response:
                         response.raise_for_status()
                         response_text = await response.text()
                         json_response = json.loads(response_text)['data'][0]
@@ -549,7 +550,7 @@ class Sniper:
                                 json.dump(self.config, f, indent=4)
                              return
                         if json_response.get("priceStatus") != "Off Sale" and json_response.get('unitsAvailableForConsumption', 0) > 0:
-                            await self.ratelimit.take(1)
+                            await self.ratelimit.take(1, proxy = True if len(self.proxies) > 0 else False)
                             productid_response = await session.post("https://apis.roblox.com/marketplace-items/v1/items/details",
                                                                      json={"itemIds": [json_response["collectibleItemId"]]},
                                                                      headers={"x-csrf-token": currentAccount["xcsrf_token"], 'Accept': "application/json"},
